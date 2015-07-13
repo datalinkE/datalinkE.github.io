@@ -1,39 +1,51 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-<title>2D Sierpinski Gasket</title>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+    <title>2D Sierpinski Gasket</title>
 
 
-<script id="vertex-shader" type="x-shader/x-vertex">
-attribute vec4 vPosition;
+    <script id="vertex-shader" type="x-shader/x-vertex">
+      attribute vec4 vPosition;
 
-void
-main()
-{
-    gl_Position = vPosition;
-}
-</script>
+      uniform float uRotation;
 
-<script id="fragment-shader" type="x-shader/x-fragment">
-precision mediump float;
+      void
+      main()
+      {
+      float sina, cosa;
+      float d = distance(vec4(0, 0, 0, 0), vPosition);
+      cosa = cos(uRotation * d);
+      sina = sin(uRotation * d);
 
-void
-main()
-{
-    gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
-}
-</script>
+      gl_Position = vec4(vPosition[0] * cosa - vPosition[1] * sina,
+      vPosition[0] * sina + vPosition[1] * cosa,
+      vPosition[2],
+      vPosition[3]);
+      }
+    </script>
 
-<script type="text/javascript" src="../angelCommon/webgl-utils.js"></script>
-<script type="text/javascript" src="../angelCommon/initShaders.js"></script>
-<script type="text/javascript" src="../angelCommon/MV.js"></script>
-<script type="text/javascript" src="assignment1.js"></script>
-</head>   
+    <script id="fragment-shader" type="x-shader/x-fragment">
+      precision mediump float;
 
-<body>
-<canvas id="gl-canvas" width="512" height="512">
-Oops ... your browser doesn't support the HTML5 canvas element
-</canvas>
-</body>
+      uniform vec4 uColor;
+
+      void
+      main()
+      {
+      gl_FragColor = uColor;
+      }
+    </script>
+
+    <script type="text/javascript" src="../angelCommon/webgl-utils.js"></script>
+    <script type="text/javascript" src="../angelCommon/initShaders.js"></script>
+    <script type="text/javascript" src="../angelCommon/MV.js"></script>
+    <script type="text/javascript" src="assignment1.js"></script>
+  </head>   
+
+  <body>
+    <canvas id="gl-canvas" width="512" height="512">
+      Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+  </body>
 </html>
