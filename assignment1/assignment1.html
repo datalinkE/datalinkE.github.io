@@ -2,21 +2,22 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-    <title>2D Sierpinski Gasket</title>
+    <title>WebGL Assignment 1 - twisted triangles</title>
 
 
     <script id="vertex-shader" type="x-shader/x-vertex">
       attribute vec4 vPosition;
 
       uniform float uRotation;
+      uniform float uTwist;
 
       void
       main()
       {
       float sina, cosa;
       float d = distance(vec4(0, 0, 0, 0), vPosition);
-      cosa = cos(uRotation * d);
-      sina = sin(uRotation * d);
+      cosa = cos(uRotation * pow(d, uTwist));
+      sina = sin(uRotation * pow(d, uTwist));
 
       gl_Position = vec4(vPosition[0] * cosa - vPosition[1] * sina,
       vPosition[0] * sina + vPosition[1] * cosa,
@@ -47,5 +48,30 @@
     <canvas id="gl-canvas" width="512" height="512">
       Oops ... your browser doesn't support the HTML5 canvas element
     </canvas>
+
+    <div>
+      <label>Recursive steps</label>
+      <label>0</label>
+      <input id="timesSlider" type="range"
+             min="0" max="5" step="1" value="5" />
+      <label>5</label>
+    </div>
+
+    <div>
+      <label>Rotation</label>
+      <label>-4 * Pi</label>
+      <input id="rotationSlider" type="range"
+             min="-12.57" max="12.57" step="0.01" value="0" />
+      <label>4 * Pi</label>
+    </div>
+
+    <div>
+      <label>Twist rate</label>
+      <label>0</label>
+      <input id="twistSlider" type="range"
+             min="0" max="1.5" step="0.1" value="1" />
+      <label>1.5</label>
+    </div>
+
   </body>
 </html>
