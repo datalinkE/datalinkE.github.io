@@ -3,10 +3,12 @@ var gl;
 
 
 //var maxNumTriangles = 200;
-var maxNumVertices  = 600;
+var maxNumVertices  = 6000;
 var index = 0;
 
 var redraw = false;
+
+var lineWidth = 20.0;
 
 var colors = [
     vec4( 0.0, 0.0, 0.0, 1.0 ),  // black
@@ -36,17 +38,22 @@ window.onload = function init() {
     canvas.addEventListener("mousemove", function(event){
 
         if(redraw) {
-            gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-            var t = vec2(2*event.clientX/canvas.width-1,
-                         2*(canvas.height-event.clientY)/canvas.height-1);
+            var vertexId = index % maxNumVertices;
 
-            var vertexPosition = index % maxNumVertices;
+            gl.bindBuffer( gl.ARRAY_BUFFER, positionBuffer );
+            var t = vec2(2*(event.clientX - lineWidth/2)/canvas.width-1,
+                         2*(canvas.height-(event.clientY - lineWidth/2))/canvas.height-1);
 
-            gl.bufferSubData(gl.ARRAY_BUFFER, 8*vertexPosition, flatten(t));
+            gl.bufferSubData(gl.ARRAY_BUFFER, 8*vertexId, flatten(t));
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-            t = vec4(colors[(vertexPosition)%7]);
-            gl.bufferSubData(gl.ARRAY_BUFFER, 16*vertexPosition, flatten(t));
+            gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+            t = vec4(colors[(vertexId)%7]);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 16*vertexId, flatten(t));
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, widthBuffer);
+            t = lineWidth;
+            gl.bufferSubData(gl.ARRAY_BUFFER, 4*vertexId, new Float32Array([t]));
+
             index++;
         }
 
@@ -56,7 +63,6 @@ window.onload = function init() {
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 0.5, 0.5, 0.5, 1.0 );
 
-
     //
     //  Load shaders and initialize attribute buffers
     //
@@ -64,24 +70,31 @@ window.onload = function init() {
     gl.useProgram( program );
 
 
-    var vBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer);
+    var positionBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData( gl.ARRAY_BUFFER, 8*maxNumVertices, gl.STATIC_DRAW );
 
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    var cBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
+    var colorBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, colorBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, 16*maxNumVertices, gl.STATIC_DRAW );
 
     var vColor = gl.getAttribLocation( program, "vColor" );
     gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vColor );
 
-    render();
+    var widthBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, widthBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, 4*maxNumVertices, gl.STATIC_DRAW );
 
+    var vWidth = gl.getAttribLocation( program, "vWidth" );
+    gl.vertexAttribPointer( vWidth, 1, gl.FLOAT, false, 0 ,0 );
+    gl.enableVertexAttribArray(vWidth);
+
+    render();
 }
 
 

@@ -6,17 +6,21 @@
 
 attribute vec4 vPosition;
 attribute vec4 vColor;
+attribute float vWidth;
 
 varying vec4 fColor;
 varying vec2 fCenter;
+varying float fWidth;
 
 void
 main()
 {
     gl_Position = vPosition;
     fColor = vColor;
-    gl_PointSize = 512.0;
+    gl_PointSize = vWidth;
     fCenter = vPosition.xy;
+    fWidth = vWidth;
+
 }
 </script>
 
@@ -26,17 +30,17 @@ precision mediump float;
 
 varying vec4 fColor;
 varying vec2 fCenter;
+varying float fWidth;
 
 void
 main()
 {
     vec2 ndc;
+    float r = fWidth / 2.0;
     ndc.x = (gl_FragCoord.x / 512.0) * 2.0 - 1.0;
     ndc.y = (gl_FragCoord.y / 512.0) * 2.0 - 1.0;
-    vec2 diff = ndc - fCenter;
-    float d2 = dot(diff,diff);
-    float r2 = 25.0 / 512.0;
-    if (d2 > r2)
+    float diff = distance(ndc, fCenter) * (512.0 / 2.0);
+    if (diff > r)
     {
         discard;
     }
