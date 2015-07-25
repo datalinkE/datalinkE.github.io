@@ -20,6 +20,8 @@ var colors = [
     vec4( 0.0, 1.0, 1.0, 1.0 )   // cyan
 ];
 
+var positions = [];
+
 
 window.onload = function init() {
     canvas = document.getElementById( "gl-canvas" );
@@ -39,22 +41,49 @@ window.onload = function init() {
 
         if(redraw) {
             var vertexId = index % maxNumVertices;
+            var prevVertexId = (index == 0) ? 0 : (index - 1) % maxNumVertices;
 
-            gl.bindBuffer( gl.ARRAY_BUFFER, positionBuffer );
-            var t = vec2(2*(event.clientX - lineWidth/2)/canvas.width-1,
+            var position = vec2(2*(event.clientX - lineWidth/2)/canvas.width-1,
                          2*(canvas.height-(event.clientY - lineWidth/2))/canvas.height-1);
 
-            gl.bufferSubData(gl.ARRAY_BUFFER, 8*vertexId, flatten(t));
+            var prevVertexPos = (index == 0) ? position : positions[prevVertexId];
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-            t = vec4(colors[(vertexId)%7]);
-            gl.bufferSubData(gl.ARRAY_BUFFER, 16*vertexId, flatten(t));
+            var color = vec4(colors[(vertexId)%7]);
+            var width =  new Float32Array([lineWidth]);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, widthBuffer);
-            t = lineWidth;
-            gl.bufferSubData(gl.ARRAY_BUFFER, 4*vertexId, new Float32Array([t]));
+            function addVertex(id, pos, col, width)
+            {
+                positions.push( pos);
+                gl.bindBuffer( gl.ARRAY_BUFFER, positionBuffer );
+                gl.bufferSubData(gl.ARRAY_BUFFER, 8*id, flatten(pos));
 
-            index++;
+                gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*id, flatten(col));
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, widthBuffer);
+                gl.bufferSubData(gl.ARRAY_BUFFER, 4*id, width);
+                index++;
+            }
+
+            var delta = length(subtract(position, prevVertexPos));
+
+            if (index != 0 && delta < 0.008)
+            {
+                return;
+            }
+
+            if (index == 0 || delta < 0.015 || delta > 1.0)
+            {
+                addVertex(vertexId, position, color, width);
+                return;
+            }
+
+            for (var dd = delta; dd > 0.03; dd-= 0.015)
+            {
+                vertexId = index % maxNumVertices
+                addVertex(vertexId, mix(prevVertexPos, position, dd/delta), color, width);
+                //console.log(dd);
+            }
         }
 
     } );
