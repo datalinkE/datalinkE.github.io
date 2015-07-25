@@ -60,5 +60,39 @@ main()
 <canvas id="gl-canvas" width="512" height="512">>
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
+
+<div>
+  <label>Line color</label>
+  <select id="colorSelect">
+    <option value="0" style="background-color: black;color: white;">Black</option>
+    <option value="1" style="background-color: red;">Red</option>
+    <option value="2" style="background-color: yellow;">Yellow</option>
+    <option value="3" style="background-color: #00FF00;" selected="1">Green</option>
+    <option value="4" style="background-color: blue;color: white;">Blue</option>
+    <option value="5" style="background-color: magenta;">Magenta</option>
+    <option value="6" style="background-color: cyan;">Cyan</option>
+    <option value="7" >Mixed</option>
+  </select>
+</div>
+
+<!--
+    vec4( 0.0, 0.0, 0.0, 1.0 ),  // black
+    vec4( 1.0, 0.0, 0.0, 1.0 ),  // red
+    vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
+    vec4( 0.0, 1.0, 0.0, 1.0 ),  // green
+    vec4( 0.0, 0.0, 1.0, 1.0 ),  // blue
+    vec4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
+    vec4( 0.0, 1.0, 1.0, 1.0 )   // cyan
+-->
+
+<div>
+  <label>Line width</label>
+  <label>5.0</label>
+  <input id="widthSlider" type="range"
+         min="5.0" max="50.0" step="1.0" value="15.0" />
+  <label>50.0</label>
+</div>
+
+
 </body>
 </html>

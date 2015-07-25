@@ -29,6 +29,22 @@ window.onload = function init() {
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
+    var widthSlider = document.getElementById("widthSlider");
+    lineWidth = parseFloat(widthSlider.value);
+    widthSlider.onchange = function() {
+        var sliderValue = parseFloat(this.value);
+        lineWidth = sliderValue;
+    }
+
+    var colorSelect = document.getElementById('colorSelect');
+    var colorIndex = colorSelect.selectedIndex;
+    colorSelect.onchange = function(e){
+        if (!e)
+            var e = window.event;
+        var svalue = this.options[this.selectedIndex].value;
+        colorIndex = parseInt(svalue);
+    }
+
     canvas.addEventListener("mousedown", function(event){
         redraw = true;
     });
@@ -48,7 +64,7 @@ window.onload = function init() {
 
             var prevVertexPos = (index == 0) ? position : positions[prevVertexId];
 
-            var color = vec4(colors[(vertexId)%7]);
+            var color = (colorIndex == 7) ? vec4(colors[(vertexId)%7]) : vec4(colors[colorIndex]);
             var width =  new Float32Array([lineWidth]);
 
             function addVertex(id, pos, col, width)
@@ -72,7 +88,7 @@ window.onload = function init() {
                 return;
             }
 
-            if (index == 0 || delta < 0.015 || delta > 1.0)
+            if (index == 0 || delta < 0.015 || delta > 0.3)
             {
                 addVertex(vertexId, position, color, width);
                 return;
