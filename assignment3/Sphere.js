@@ -46,7 +46,6 @@ function Sphere(radius, numTimesToSundivide)
     this.pointsArray = [];
     this.index = 0;
     this.radius = radius;
-    this.numTimesToSubdivide;
 
     // private temporaries
     var va = vec4(0.0, 0.0, -1.0, 1);
@@ -59,7 +58,7 @@ function Sphere(radius, numTimesToSundivide)
         this.pointsArray.push(b);
         this.pointsArray.push(c);
         this.index += 3;
-    }
+    };
 
     this.divideTriangle = function divideTriangle(a, b, c, count) {
         if ( count > 0 ) {
@@ -76,14 +75,14 @@ function Sphere(radius, numTimesToSundivide)
         else { // draw tetrahedron at end of recursion
             this.triangle( a, b, c );
         }
-    }
+    };
 
     this.tetrahedron = function tetrahedron(a, b, c, d, n) {
         this.divideTriangle(a, b, c, n);
         this.divideTriangle(d, c, b, n);
         this.divideTriangle(a, d, b, n);
         this.divideTriangle(a, c, d, n);
-    }
+    };
 
     //construction
     this.tetrahedron(va, vb, vc, vd, numTimesToSubdivide);
@@ -127,5 +126,5 @@ function Sphere(radius, numTimesToSundivide)
 
         gl.bindBuffer( gl.ARRAY_BUFFER, null);
         gl.disableVertexAttribArray(vPosition);
-    }
+    };
 }
