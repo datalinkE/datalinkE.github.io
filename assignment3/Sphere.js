@@ -10,7 +10,7 @@ var theta  = 0.0;
 var phi    = 0.0;
 var dr = 5.0 * Math.PI/180.0;
 
-var numTimesToSubdivide = 5;
+var numTimesToSubdivide = 2;
 
 var left = -2.0;
 var right = 2.0;
@@ -20,8 +20,54 @@ var bottom = -2.0;
 const at = vec3(0.0, 0.0, 0.0);
 const up = vec3(0.0, 1.0, 0.0);
 
+
+
+var mouseDown = false;
+var lastMouseX = null;
+var lastMouseY = null;
+
+var rotationMatrix = mat4(1.0);
+
+function handleMouseDown(event) {
+    mouseDown = true;
+    lastMouseX = event.clientX;
+    lastMouseY = event.clientY;
+}
+
+function handleMouseUp(event) {
+    mouseDown = false;
+}
+
+function handleMouseMove(event) {
+    if (!mouseDown) {
+        return;
+    }
+    var newX = event.clientX;
+    var newY = event.clientY;
+
+    var deltaX = newX - lastMouseX;
+    phi += deltaX / 5;
+    var newRotationMatrix = rotate(phi, [0, 1, 0]);
+
+    var deltaY = newY - lastMouseY;
+    theta -= deltaY / 5;
+    newRotationMatrix = mult(newRotationMatrix, rotate(theta, [1, 0, 0]));
+
+    rotationMatrix = newRotationMatrix;
+
+    lastMouseX = newX;
+    lastMouseY = newY;
+
+    //console.log(rotationMatrix);
+}
+
+
 window.onload = function init() {
     canvas = document.getElementById( "gl-canvas" );
+
+    canvas.onmousedown = handleMouseDown;
+    document.onmouseup = handleMouseUp;
+    document.onmousemove = handleMouseMove;
 
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
@@ -37,8 +83,15 @@ window.onload = function init() {
     gl.useProgram( program );
 
     var sphere1 = new Sphere(radius, numTimesToSubdivide);
-    sphere1.render(gl, program);
-}
+
+    function render()
+    {
+        sphere1.render(gl, program);
+        window.requestAnimFrame(render);
+    }
+
+    render();
+};
 
 function Sphere(radius, numTimesToSundivide)
 {
@@ -88,18 +141,19 @@ function Sphere(radius, numTimesToSundivide)
     this.tetrahedron(va, vb, vc, vd, numTimesToSubdivide);
 
     this.vBuffer = null;
-    this.eye = vec3(radius*Math.sin(theta)*Math.cos(phi),
-                    radius*Math.sin(theta)*Math.sin(phi),
-                    radius*Math.cos(theta));
+    // this.eye = vec3(radius*Math.sin(theta)*Math.cos(phi),
+    //                 radius*Math.sin(theta)*Math.sin(phi),
+    //                 radius*Math.cos(theta));
+    this.eye = vec3(0.0, 0.0, 0.0);
 
-    this.modelViewMatrix = lookAt(this.eye, at, up);
 
+    this.modelViewMatrix = mult(lookAt(this.eye, at, up), rotationMatrix);
     this.projectionMatrix = ortho(left, right, bottom, ytop, near, far);
 
     this.vBuffer = gl.createBuffer();
 
 
-    this.render = function render(gl, program)
+    this.render = function(gl, program)
     {
         gl.bindBuffer( gl.ARRAY_BUFFER, this.vBuffer);
         gl.bufferData( gl.ARRAY_BUFFER, flatten(this.pointsArray), gl.STATIC_DRAW);
@@ -112,11 +166,13 @@ function Sphere(radius, numTimesToSundivide)
         var projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
         var colorLoc = gl.getUniformLocation( program, "color" );
 
+
+        this.modelViewMatrix = mult(lookAt(this.eye, at, up), rotationMatrix);
         gl.uniformMatrix4fv( modelViewMatrixLoc, false, flatten(this.modelViewMatrix) );
         gl.uniformMatrix4fv( projectionMatrixLoc, false, flatten(this.projectionMatrix) );
 
         gl.uniform4f( colorLoc, 1.0, 0.0, 0.0, 1.0 );
-        gl.drawArrays( gl.TRIANGLES, 0, this.index );
+        //gl.drawArrays( gl.TRIANGLES, 0, this.index );
 
         for( var i=0; i< this.index; i+=3)
         {
