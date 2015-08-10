@@ -11,8 +11,13 @@ var right = 5.0;
 var ytop = 5.0;
 var bottom = -5.0;
 
+var side = 512;
+
 var projectionMatrix = null;
 //projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+
+var primitivesToRender = [];
+var cursorPrimitive = null;
 
 var fov = 90.0;
 var aspect = 1.0;
@@ -44,18 +49,34 @@ function handleMouseDown(event) {
     mouseDown = true;
     lastMouseX = event.clientX;
     lastMouseY = event.clientY;
+    console.log(lastMouseX);
+    console.log(lastMouseY);
 }
 
 function handleMouseUp(event) {
     mouseDown = false;
+
+    primitivesToRender.push(cursorPrimitive);
+    
+    cursorPrimitive = new Sphere(0.5, 0);
+    cursorPrimitive.colorWf = vec3(0.4, 0.4, 0.0);
 }
 
+var cursorPosX = 0;
+var cursorPosY = 0;
+
 function handleMouseMove(event) {
-    if (!mouseDown) {
-        return;
-    }
     var newX = event.clientX;
     var newY = event.clientY;
+    var canvasRect = this.getBoundingClientRect();
+
+    if (!mouseDown) {
+        cursorPosX = (newX - canvasRect.left - side/2) * 2 / side;
+        cursorPosY = (-newY + canvasRect.top + side/2) * 2 / side;
+        console.log(cursorPosX);
+        console.log(cursorPosY);
+        return;
+    }
 
     var deltaX = newX - lastMouseX;
     phi += deltaX / 5;
@@ -71,13 +92,22 @@ function handleMouseMove(event) {
     lastMouseY = newY;
 }
 
+var wheelDistance = 0.0;
+
+function handleMouseWheel(event) {
+    var delta = event.deltaY > 0 ? 1 : -1;
+    wheelDistance += delta / 20;
+    console.log(wheelDistance);
+}
+
 
 window.onload = function init() {
     canvas = document.getElementById( "gl-canvas" );
 
     canvas.onmousedown = handleMouseDown;
     document.onmouseup = handleMouseUp;
-    document.onmousemove = handleMouseMove;
+    canvas.onmousemove = handleMouseMove;
+    canvas.onwheel = handleMouseWheel;
 
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
@@ -125,16 +155,26 @@ window.onload = function init() {
 
     var sphere1 = new Sphere(0.5, 1);
     sphere1.colorWf = vec3(0.4, 0.0, 0.4);
+    primitivesToRender.push(sphere1);
 
-    var sphere2 = new Sphere(0.5, 0);
-    sphere1.colorWf = vec3(0.4, 0.0, 0.4);
+    cursorPrimitive = new Sphere(0.5, 0);
+    cursorPrimitive.colorWf = vec3(0.4, 0.4, 0.0);
 
     function render()
     {
+        console.log("render");
         drawAxis();
-        
-        sphere1.render(gl, program);
-        sphere2.render(gl, program);
+
+        cursorPrimitive.position[0] = cursorPosX * Math.abs(wheelDistance + 2.0);
+        cursorPrimitive.position[1] = cursorPosY * Math.abs(wheelDistance + 2.0);
+        cursorPrimitive.position[2] = wheelDistance;
+        cursorPrimitive.render(gl, program);
+
+        var i, length;
+        for( i = 0, length = primitivesToRender.length; i < length; i++)
+        {
+            primitivesToRender[i].render(gl, program);
+        };
 
         window.requestAnimFrame(render);
     }
