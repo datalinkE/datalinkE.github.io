@@ -23,7 +23,8 @@ var fov = 90.0;
 var aspect = 1.0;
 projectionMatrix = perspective(fov, aspect, 0.1, far);
 
-var eye = vec3(0.0, 0.0, 2.0);
+var eyeOffset = 2.0;
+var eye = vec3(0.0, 0.0, eyeOffset);
 const at = vec3(0.0, 0.0, 0.0);
 const up = vec3(0.0, 1.0, 0.0);
 var viewMatrix =  lookAt(eye, at, up);
@@ -165,8 +166,8 @@ window.onload = function init() {
         console.log("render");
         drawAxis();
 
-        cursorPrimitive.position[0] = cursorPosX * Math.abs(wheelDistance + 2.0);
-        cursorPrimitive.position[1] = cursorPosY * Math.abs(wheelDistance + 2.0);
+        cursorPrimitive.position[0] = cursorPosX * (-wheelDistance + eyeOffset);
+        cursorPrimitive.position[1] = cursorPosY * (-wheelDistance + eyeOffset);
         cursorPrimitive.position[2] = wheelDistance;
         cursorPrimitive.render(gl, program);
 
