@@ -7,6 +7,7 @@ function Primitive(size, points)
     this.pointsArray = points;
     this.size = size;
     this.position = vec3(0.0, 0.0, 0.0);
+    this.orientation = mat4(1.0);
 
     this.color = vec3(0.4, 0.4, 0.8);
     this.colorWf = vec3(0.0, 0.0, 0.0);
@@ -40,8 +41,10 @@ function Primitive(size, points)
         this.modelViewMatrix = mat4(1.0);
         this.modelViewMatrix = mult(scalem(this.size, this.size, this.size), this.modelViewMatrix);
         this.modelViewMatrix = mult(translate(this.position[0], this.position[1], this.position[2]), this.modelViewMatrix);
+        this.modelViewMatrix = mult(this.orientation, this.modelViewMatrix);
         this.modelViewMatrix = mult(rotationMatrix, this.modelViewMatrix);
         this.modelViewMatrix = mult(viewMatrix, this.modelViewMatrix);
+
         gl.uniformMatrix4fv( modelViewMatrixLoc, false, flatten(this.modelViewMatrix) );
         gl.uniformMatrix4fv( projectionMatrixLoc, false, flatten(projectionMatrix) );
 

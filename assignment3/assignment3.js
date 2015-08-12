@@ -39,28 +39,40 @@ axisPoints.push(vec4(0.0, 0.0, 1.0));
 
 var axisBuffer = null;
 
-
 var mouseDown = false;
 var lastMouseX = null;
 var lastMouseY = null;
 
 var rotationMatrix = mat4(1.0);
 
+var lastMouseDown = Date.now();
+
 function handleMouseDown(event) {
     mouseDown = true;
     lastMouseX = event.clientX;
     lastMouseY = event.clientY;
-    console.log(lastMouseX);
-    console.log(lastMouseY);
+    //console.log(lastMouseX);
+    //console.log(lastMouseY);
+    lastMouseDown = Date.now();
 }
 
 function handleMouseUp(event) {
     mouseDown = false;
 
-    primitivesToRender.push(cursorPrimitive);
-    
-    cursorPrimitive = new Sphere(0.5, 0);
-    cursorPrimitive.colorWf = vec3(0.4, 0.4, 0.0);
+    var elapsedFromLastMouseDown = Date.now() - lastMouseDown;
+
+    console.log(elapsedFromLastMouseDown);
+
+    if (elapsedFromLastMouseDown < 500)
+    {// if press tooks more than half a second we are rotating the camera, not setting object
+        primitivesToRender.push(cursorPrimitive);
+
+        var newCursor = new Sphere(0.5, 0);
+        newCursor.colorWf = vec3(0.4, 0.4, 0.0);
+        newCursor.orientation = cursorPrimitive.orientation;
+
+        cursorPrimitive = newCursor;
+    }
 }
 
 var cursorPosX = 0;
@@ -74,8 +86,8 @@ function handleMouseMove(event) {
     if (!mouseDown) {
         cursorPosX = (newX - canvasRect.left - side/2) * 2 / side;
         cursorPosY = (-newY + canvasRect.top + side/2) * 2 / side;
-        console.log(cursorPosX);
-        console.log(cursorPosY);
+        //console.log(cursorPosX);
+        //console.log(cursorPosY);
         return;
     }
 
@@ -88,6 +100,9 @@ function handleMouseMove(event) {
     newRotationMatrix = mult(newRotationMatrix, rotate(theta, [1, 0, 0]));
 
     rotationMatrix = newRotationMatrix;
+
+    cursorPrimitive.orientation = rotate(-theta, [1, 0, 0]);
+    cursorPrimitive.orientation = mult(cursorPrimitive.orientation, rotate(-phi, [0, 1, 0]));
 
     lastMouseX = newX;
     lastMouseY = newY;
@@ -163,7 +178,7 @@ window.onload = function init() {
 
     function render()
     {
-        console.log("render");
+        //console.log("render");
         drawAxis();
 
         cursorPrimitive.position[0] = cursorPosX * (-wheelDistance + eyeOffset);
