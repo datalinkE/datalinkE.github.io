@@ -29,14 +29,10 @@ main()
 }
 </script>
 
-<p> </p>
-<button id = "Button0">Increase theta</button>
-<button id = "Button1">Decrease theta</button>
-<button id = "Button2">Increase phi</button>
-<button id = "Button3">Decrease phi</button>
-<p> </p>
-<button id = "Button4">Increase Subdivisions</button>
-<button id = "Button5">Decrease Subdivisions</button>
+<link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/bgrins/spectrum/master/spectrum.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://cdn.rawgit.com/bgrins/spectrum/master/spectrum.js"></script>
 
 <script type="text/javascript" src="../angelCommon/webgl-utils.js"></script>
 <script type="text/javascript" src="../angelCommon/initShaders.js"></script>
@@ -46,9 +42,14 @@ main()
 <script type="text/javascript" src="assignment3.js"></script>
 
 
+
+
 <body>
 <canvas id="gl-canvas" width="512" height="512" style="border: 1px solid black;">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
+
+<input type='text' id="flatColorPicker" />
+
 </body>
 </html>

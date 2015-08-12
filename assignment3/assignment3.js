@@ -18,6 +18,7 @@ var projectionMatrix = null;
 
 var primitivesToRender = [];
 var cursorPrimitive = null;
+var cursorColorWf = vec3(0.4, 0.4, 0.0);
 
 var fov = 90.0;
 var aspect = 1.0;
@@ -61,14 +62,14 @@ function handleMouseUp(event) {
 
     var elapsedFromLastMouseDown = Date.now() - lastMouseDown;
 
-    console.log(elapsedFromLastMouseDown);
+    //console.log(elapsedFromLastMouseDown);
 
     if (elapsedFromLastMouseDown < 500)
     {// if press tooks more than half a second we are rotating the camera, not setting object
         primitivesToRender.push(cursorPrimitive);
 
         var newCursor = new Sphere(0.5, 0);
-        newCursor.colorWf = vec3(0.4, 0.4, 0.0);
+        newCursor.colorWf = cursorColorWf;
         newCursor.orientation = cursorPrimitive.orientation;
 
         cursorPrimitive = newCursor;
@@ -118,6 +119,17 @@ function handleMouseWheel(event) {
 
 
 window.onload = function init() {
+
+    $("#flatColorPicker").spectrum({
+        flat: true,
+        showInput: true,
+        move: function(color) {
+            var rgba = color.toRgb();
+            cursorColorWf = vec3(rgba.r / 255, rgba.g / 255, rgba.b / 255);
+            cursorPrimitive.colorWf = cursorColorWf;
+        }
+    });
+
     canvas = document.getElementById( "gl-canvas" );
 
     canvas.onmousedown = handleMouseDown;
@@ -174,7 +186,7 @@ window.onload = function init() {
     primitivesToRender.push(sphere1);
 
     cursorPrimitive = new Sphere(0.5, 0);
-    cursorPrimitive.colorWf = vec3(0.4, 0.4, 0.0);
+    cursorPrimitive.colorWf = cursorColorWf;
 
     function render()
     {
