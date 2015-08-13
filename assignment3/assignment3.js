@@ -73,7 +73,7 @@ function handleMouseUp(event) {
     {// if press tooks more than half a second we are rotating the camera, not setting object
         primitivesToRender.push(cursorPrimitive);
 
-        var newCursor = new Sphere(0.5, 0);
+        var newCursor = new Cylinder(0.5, 5);
         newCursor.color = cursorColor;
         newCursor.colorWf = cursorColorWf;
         newCursor.orientation = cursorPrimitive.orientation;
@@ -220,12 +220,12 @@ window.onload = function init() {
         gl.disableVertexAttribArray(vPosition);
     }
 
-    var sphere1 = new Sphere(0.5, 1);
+    var sphere1 = new Sphere(0.3, 3);
     sphere1.color = vec3(0.4, 0.4, 0.4);
     sphere1.colorWf = vec3(0.4, 0.0, 0.4);
     primitivesToRender.push(sphere1);
 
-    cursorPrimitive = new Sphere(0.5, 0);
+    cursorPrimitive = new Cylinder(0.5, 5);
     cursorPrimitive.color = cursorColor;
     cursorPrimitive.colorWf = cursorColorWf;
 
