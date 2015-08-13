@@ -49,7 +49,22 @@ main()
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 
-<input type='text' id="flatColorPicker" />
+<div style="width: 200px; display: inline-block;">
+    <div>
+        <label>
+            <input type='checkbox' id="showWireframe" checked>
+            Show cursor wireframe?
+        </label>
+        <input type='text' id="flatColorPickerWf" />
+    </div>
+    <div>
+        <label>
+            <input type='checkbox' id="fillPolygons">
+            Fill cursor polygons?
+        </label>
+        <input type='text' id="flatColorPicker" />
+    </div>
+</div>
 
 </body>
 </html>

@@ -1,5 +1,10 @@
 var canvas;
+var wireframeCheckbox;
+var polygonsCheckbox;
+
 var gl;
+
+var side = 512;
 
 var near = -5.0;
 var far = 5.0;
@@ -11,18 +16,20 @@ var right = 5.0;
 var ytop = 5.0;
 var bottom = -5.0;
 
-var side = 512;
-
 var projectionMatrix = null;
 //projectionMatrix = ortho(left, right, bottom, ytop, near, far);
-
-var primitivesToRender = [];
-var cursorPrimitive = null;
-var cursorColorWf = vec3(0.4, 0.4, 0.0);
 
 var fov = 90.0;
 var aspect = 1.0;
 projectionMatrix = perspective(fov, aspect, 0.1, far);
+
+var primitivesToRender = [];
+var cursorPrimitive = null;
+var cursorColor = vec3(0.4, 0.0, 0.4);
+var cursorColorWf = vec3(0.4, 0.4, 0.0);
+var cursorWireframe = true;
+var cursorPolygons = false;
+
 
 var eyeOffset = 2.0;
 var eye = vec3(0.0, 0.0, eyeOffset);
@@ -52,8 +59,6 @@ function handleMouseDown(event) {
     mouseDown = true;
     lastMouseX = event.clientX;
     lastMouseY = event.clientY;
-    //console.log(lastMouseX);
-    //console.log(lastMouseY);
     lastMouseDown = Date.now();
 }
 
@@ -69,8 +74,11 @@ function handleMouseUp(event) {
         primitivesToRender.push(cursorPrimitive);
 
         var newCursor = new Sphere(0.5, 0);
+        newCursor.color = cursorColor;
         newCursor.colorWf = cursorColorWf;
         newCursor.orientation = cursorPrimitive.orientation;
+        newCursor.wireframe = cursorWireframe;
+        newCursor.polygons = cursorPolygons;
 
         cursorPrimitive = newCursor;
     }
@@ -87,8 +95,6 @@ function handleMouseMove(event) {
     if (!mouseDown) {
         cursorPosX = (newX - canvasRect.left - side/2) * 2 / side;
         cursorPosY = (-newY + canvasRect.top + side/2) * 2 / side;
-        //console.log(cursorPosX);
-        //console.log(cursorPosY);
         return;
     }
 
@@ -117,17 +123,30 @@ function handleMouseWheel(event) {
     console.log(wheelDistance);
 }
 
-
-window.onload = function init() {
-
-    $("#flatColorPicker").spectrum({
+function setupUI()
+{
+    $("#flatColorPickerWf").spectrum({
         flat: true,
         showInput: true,
         move: function(color) {
             var rgba = color.toRgb();
             cursorColorWf = vec3(rgba.r / 255, rgba.g / 255, rgba.b / 255);
             cursorPrimitive.colorWf = cursorColorWf;
-        }
+        },
+        showButtons: false,
+        color: {r: cursorColorWf[0] * 255, g: cursorColorWf[1] * 255, b: cursorColorWf[2] * 255}
+    });
+
+    $("#flatColorPicker").spectrum({
+        flat: true,
+        showInput: true,
+        move: function(color) {
+            var rgba = color.toRgb();
+            cursorColor = vec3(rgba.r / 255, rgba.g / 255, rgba.b / 255);
+            cursorPrimitive.color = cursorColor;
+        },
+        showButtons: false,
+        color: {r: cursorColor[0] * 255, g: cursorColor[1] * 255, b: cursorColor[2] * 255}
     });
 
     canvas = document.getElementById( "gl-canvas" );
@@ -136,6 +155,26 @@ window.onload = function init() {
     document.onmouseup = handleMouseUp;
     canvas.onmousemove = handleMouseMove;
     canvas.onwheel = handleMouseWheel;
+
+    wireframeCheckbox = document.getElementById("showWireframe");
+    wireframeCheckbox.onclick = function()
+    {
+        cursorPrimitive.wireframe = wireframeCheckbox.checked;
+        cursorWireframe = wireframeCheckbox.checked;
+    };
+
+    polygonsCheckbox = document.getElementById("fillPolygons");
+    polygonsCheckbox.onclick = function()
+    {
+        cursorPrimitive.polygons = polygonsCheckbox.checked;
+        cursorPolygons = polygonsCheckbox.checked;
+    };
+
+}
+
+window.onload = function init() {
+
+    setupUI();
 
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
@@ -182,11 +221,16 @@ window.onload = function init() {
     }
 
     var sphere1 = new Sphere(0.5, 1);
+    sphere1.color = vec3(0.4, 0.4, 0.4);
     sphere1.colorWf = vec3(0.4, 0.0, 0.4);
     primitivesToRender.push(sphere1);
 
     cursorPrimitive = new Sphere(0.5, 0);
+    cursorPrimitive.color = cursorColor;
     cursorPrimitive.colorWf = cursorColorWf;
+
+    cursorPrimitive.wireframe = cursorWireframe;
+    cursorPrimitive.polygons = cursorPolygons;
 
     function render()
     {
