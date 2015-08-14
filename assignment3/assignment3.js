@@ -120,7 +120,7 @@ var wheelDistance = 0.0;
 function handleMouseWheel(event) {
     var delta = event.deltaY > 0 ? 1 : -1;
     wheelDistance += delta / 20;
-    console.log(wheelDistance);
+    //console.log(wheelDistance);
 }
 
 function setupUI()
@@ -225,7 +225,7 @@ window.onload = function init() {
     sphere1.colorWf = vec3(0.4, 0.0, 0.4);
     primitivesToRender.push(sphere1);
 
-    cursorPrimitive = new Cylinder(0.5, 5);
+    cursorPrimitive = new Cone(0.5, 5);
     cursorPrimitive.color = cursorColor;
     cursorPrimitive.colorWf = cursorColorWf;
 
