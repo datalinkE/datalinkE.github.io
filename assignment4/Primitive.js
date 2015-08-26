@@ -1,10 +1,11 @@
 "use strict";
 
 
-function Primitive(size, points)
+function Primitive(size, points, normals)
 {
     // member variables
-    this.pointsArray = points;
+    this.pointsArray  = points;
+    this.normalsArray = normals;
     this.size = size;
     this.position = vec3(0.0, 0.0, 0.0);
     this.orientation = mat4(1.0);

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+attribute vec4 vPosition;
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+void
+main()
+{
+    gl_Position = projectionMatrix*modelViewMatrix*vPosition;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+uniform vec4 color;
+
+void
+main()
+{
+    gl_FragColor = color;
+}
+</script>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/bgrins/spectrum/master/spectrum.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://cdn.rawgit.com/bgrins/spectrum/master/spectrum.js"></script>
+
+<script type="text/javascript" src="../angelCommon/webgl-utils.js"></script>
+<script type="text/javascript" src="../angelCommon/initShaders.js"></script>
+<script type="text/javascript" src="../angelCommon/MV.js"></script>
+<script type="text/javascript" src="Primitive.js"></script>
+<script type="text/javascript" src="Sphere.js"></script>
+<script type="text/javascript" src="Cylinder.js"></script>
+<script type="text/javascript" src="Cone.js"></script>
+
+<script type="text/javascript" src="main.js"></script>
+
+
+
+
+<body>
+<canvas id="gl-canvas" width="512" height="512" style="border: 1px solid black;">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+
+<div style="width: 200px; display: inline-block;">
+    <div>
+        <label>
+            <input type='checkbox' id="showWireframe" checked>
+            Show cursor wireframe?
+        </label>
+        <input type='text' id="flatColorPickerWf" />
+    </div>
+    <div>
+        <label>
+            <input type='checkbox' id="fillPolygons">
+            Fill cursor polygons?
+        </label>
+        <input type='text' id="flatColorPicker" />
+    </div>
+</div>
+
+</body>
+</html>
