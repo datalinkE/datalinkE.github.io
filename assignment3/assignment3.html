@@ -53,6 +53,17 @@ Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 
 <div style="width: 200px; display: inline-block;">
+    <label>
+        Mouse1 - create new primitive
+    </label>
+    <label>
+        Mouse1+hold - rotate camera
+    </label>
+    <label>
+        MouseWheel - cursor size
+    </label>
+    <br/>
+    <br/>
     <div>
         <label>
             <input type='checkbox' id="showWireframe" checked>
@@ -66,6 +77,26 @@ Oops ... your browser doesn't support the HTML5 canvas element
             Fill cursor polygons?
         </label>
         <input type='text' id="flatColorPicker" />
+    </div>
+</div>
+
+<div style="width: 512px; border: 1px solid blue">
+    <input type='radio' id='sphere' name='primitives'/>
+    <label for='sphere'>Sphere</label>
+    <input type='radio' id='cone' name='primitives' checked/>
+    <label for='cone'>Cone</label>
+    <input type='radio' id='cylinder' name='primitives'/>
+    <label for='cylinder'>Cylinder</label>
+
+    <div style="display: inline-block; margin-left: 50px;">
+      <label for='sizer'>Size</label>
+      <input type='range' min='0.2' max='2' step='0.1' value='0.5' id='sizer' step=0.1 oninput="outputUpdate(value)">
+      <output for='sizer' id='size'>1</output>
+      <script>
+      function outputUpdate(vol) {
+          document.querySelector('#size').value = vol;
+      }
+      </script>
     </div>
 </div>
 
