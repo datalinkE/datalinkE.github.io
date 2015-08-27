@@ -1,6 +1,10 @@
 var canvas;
 var wireframeCheckbox;
 var polygonsCheckbox;
+var coneStatus;
+var sphereStatus;
+var cylinderStatus;
+var sizer;
 
 var gl;
 
@@ -29,7 +33,7 @@ var cursorColor = vec3(0.4, 0.0, 0.4);
 var cursorColorWf = vec3(0.4, 0.4, 0.0);
 var cursorWireframe = true;
 var cursorPolygons = false;
-
+var cursorSize = 0.5;
 
 var eyeOffset = 2.0;
 var eye = vec3(0.0, 0.0, eyeOffset);
@@ -62,6 +66,31 @@ function handleMouseDown(event) {
     lastMouseDown = Date.now();
 }
 
+function respawnCursor()
+{
+
+    var newCursor = null;
+
+    if (coneStatus.checked)
+    {
+        newCursor = new Cone(cursorSize, 40);
+    }
+    else if (sphereStatus.checked) {
+        newCursor = new Sphere(cursorSize, 4);
+    }
+    else if (cylinderStatus.checked) {
+        newCursor = new Cylinder(cursorSize, 40);
+    }
+
+    newCursor.color = cursorColor;
+    newCursor.colorWf = cursorColorWf;
+    newCursor.orientation = cursorPrimitive ? cursorPrimitive.orientation : mat4(1.0);
+    newCursor.wireframe = cursorWireframe;
+    newCursor.polygons = cursorPolygons;
+
+    cursorPrimitive = newCursor;
+}
+
 function handleMouseUp(event) {
     mouseDown = false;
 
@@ -72,15 +101,7 @@ function handleMouseUp(event) {
     if (elapsedFromLastMouseDown < 500)
     {// if press tooks more than half a second we are rotating the camera, not setting object
         primitivesToRender.push(cursorPrimitive);
-
-        var newCursor = new Cylinder(0.5, 5);
-        newCursor.color = cursorColor;
-        newCursor.colorWf = cursorColorWf;
-        newCursor.orientation = cursorPrimitive.orientation;
-        newCursor.wireframe = cursorWireframe;
-        newCursor.polygons = cursorPolygons;
-
-        cursorPrimitive = newCursor;
+        respawnCursor();
     }
 }
 
@@ -123,15 +144,34 @@ function handleMouseWheel(event) {
     //console.log(wheelDistance);
 }
 
+function handleSizeChange() {
+    cursorPrimitive.size = parseFloat(this.value);
+    cursorSize = cursorPrimitive.size;
+}
+
+function handlePrimitiveChange() {
+    respawnCursor();
+}
+
 function setupUI()
 {
+    coneStatus = document.getElementById("cone");
+    sphereStatus = document.getElementById("sphere");
+    cylinderStatus = document.getElementById("cylinder");
+    sizer = document.getElementById("sizer");
+
+    coneStatus.onclick = handlePrimitiveChange;
+    sphereStatus.onclick = handlePrimitiveChange;
+    cylinderStatus.onclick = handlePrimitiveChange;
+    sizer.onchange = handleSizeChange;
+
     $("#flatColorPickerWf").spectrum({
         flat: true,
         showInput: true,
         move: function(color) {
             var rgba = color.toRgb();
             cursorColorWf = vec3(rgba.r / 255, rgba.g / 255, rgba.b / 255);
-            cursorPrimitive.colorWf = cursorColorWf;
+            respawnCursor();
         },
         showButtons: false,
         color: {r: cursorColorWf[0] * 255, g: cursorColorWf[1] * 255, b: cursorColorWf[2] * 255}
@@ -143,7 +183,7 @@ function setupUI()
         move: function(color) {
             var rgba = color.toRgb();
             cursorColor = vec3(rgba.r / 255, rgba.g / 255, rgba.b / 255);
-            cursorPrimitive.color = cursorColor;
+            respawnCursor();
         },
         showButtons: false,
         color: {r: cursorColor[0] * 255, g: cursorColor[1] * 255, b: cursorColor[2] * 255}
@@ -220,17 +260,12 @@ window.onload = function init() {
         gl.disableVertexAttribArray(vPosition);
     }
 
-    var sphere1 = new Sphere(0.3, 3);
+    var sphere1 = new Sphere(0.3, 5);
     sphere1.color = vec3(0.4, 0.4, 0.4);
     sphere1.colorWf = vec3(0.4, 0.0, 0.4);
     primitivesToRender.push(sphere1);
 
-    cursorPrimitive = new Cone(0.5, 5);
-    cursorPrimitive.color = cursorColor;
-    cursorPrimitive.colorWf = cursorColorWf;
-
-    cursorPrimitive.wireframe = cursorWireframe;
-    cursorPrimitive.polygons = cursorPolygons;
+    respawnCursor();
 
     function render()
     {

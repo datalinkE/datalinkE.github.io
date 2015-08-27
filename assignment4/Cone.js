@@ -6,6 +6,10 @@ function conePoints(segments) {
 
     var coneBotVertices = [];
     var coneSideVertices = [];
+
+    var points = [];
+    var normals = [];
+
     for (var i =0; i <= segments; i++){
         var x =  Math.cos(theta*i);
         var z =  Math.sin(theta*i);
@@ -13,22 +17,26 @@ function conePoints(segments) {
         var z1 =  Math.sin(theta*i + theta);
 
         //Bottomvertices
-        coneBotVertices.push(vec4(0.0, 0.0, 0.0, 1.0));
-        coneBotVertices.push(vec4(x, 0.0, z, 1.0));
-        coneBotVertices.push(vec4(x1, 0.0, z1, 1.0));
+        triangle(points, normals,
+                vec4(0.0, 0.0, 0.0, 1.0),
+                vec4(x, 0.0, z, 1.0),
+                vec4(x1, 0.0, z1, 1.0));
 
         //Sidevertices
-        coneSideVertices.push(vec4(0.0, h, 0.0));
-        coneSideVertices.push(vec4(x1, 0.0, z1, 1.0));
-        coneSideVertices.push(vec4(x, 0.0, z, 1.0));
+        triangle(points, normals,
+                vec4(0.0, h, 0.0),
+                vec4(x1, 0.0, z1, 1.0),
+                vec4(x, 0.0, z, 1.0));
     }
 
-    return coneBotVertices.concat(coneSideVertices);
+    return {"points" : points, "normals" : normals};
 }
 
 
 function Cone(size, segments)
 {
-    this.pointsArray = conePoints(segments);
-    Primitive.call(this, size, this.pointsArray);
+    var data = conePoints(segments);
+    this.pointsArray = data.points;
+    this.normalsArray = data.normals;
+    Primitive.call(this, size, this.pointsArray, this.normalsArray);
 };

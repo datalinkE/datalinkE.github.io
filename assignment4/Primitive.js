@@ -1,5 +1,20 @@
 "use strict";
 
+function triangle(pointsRef, normalsRef, a, b, c) {
+    pointsRef.push(a);
+    pointsRef.push(b);
+    pointsRef.push(c);
+
+    var t1 = subtract(b, a);
+    var t2 = subtract(c, a);
+    var normal = normalize(cross(t2, t1));
+    normal = vec4(normal);
+    normal[3]  = 0.0;
+
+    normalsRef.push(normal);
+    normalsRef.push(normal);
+    normalsRef.push(normal);
+};
 
 function Primitive(size, points, normals)
 {

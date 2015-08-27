@@ -1,21 +1,5 @@
 "use strict";
 
-function triangle(pointsRef, normalsRef, a, b, c) {
-    pointsRef.push(a);
-    pointsRef.push(b);
-    pointsRef.push(c);
-
-    var t1 = subtract(b, a);
-    var t2 = subtract(c, a);
-    var normal = normalize(cross(t2, t1));
-    normal = vec4(normal);
-    normal[3]  = 0.0;
-
-    normalsRef.push(normal);
-    normalsRef.push(normal);
-    normalsRef.push(normal);
-};
-
 function divideTriangle(pointsRef, normalsRef, a, b, c, count) {
     if ( count > 0 ) {
 
@@ -23,10 +7,10 @@ function divideTriangle(pointsRef, normalsRef, a, b, c, count) {
         var ac = normalize(mix( a, c, 0.5), true);
         var bc = normalize(mix( b, c, 0.5), true);
 
-        divideTriangle( pointsRef, a, ab, ac, count - 1 );
-        divideTriangle( pointsRef, ab, b, bc, count - 1 );
-        divideTriangle( pointsRef, bc, c, ac, count - 1 );
-        divideTriangle( pointsRef, ab, bc, ac, count - 1 );
+        divideTriangle( pointsRef, normalsRef, a, ab, ac, count - 1 );
+        divideTriangle( pointsRef, normalsRef, ab, b, bc, count - 1 );
+        divideTriangle( pointsRef, normalsRef, bc, c, ac, count - 1 );
+        divideTriangle( pointsRef, normalsRef, ab, bc, ac, count - 1 );
     }
     else { // draw tetrahedron at end of recursion
         triangle( pointsRef, normalsRef, a, b, c );
@@ -57,6 +41,6 @@ function Sphere(size, numTimesToSubdivide)
 {
     var data = spherePoints(numTimesToSubdivide);
     this.pointsArray = data.points;
-    this.pointsArray = data.normals;
+    this.normalsArray = data.normals;
     Primitive.call(this, size, this.pointsArray, this.normalsArray);
 };

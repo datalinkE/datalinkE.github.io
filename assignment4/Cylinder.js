@@ -8,6 +8,9 @@ function cylinderPoints(segments) {
     var cylinderSideVertices = [];
     var cylinderTopVertices = [];
 
+    var points = [];
+    var normals = [];
+
     for (var i =0; i <= segments; i++){
         var x =  Math.cos(theta*i);
         var z =  Math.sin(theta*i);
@@ -15,31 +18,37 @@ function cylinderPoints(segments) {
         var z1 =  Math.sin(theta*i + theta);
 
         //Bottomvertices
-        cylinderBotVertices.push(vec4(0.0, 0.0, 0.0, 1.0));
-        cylinderBotVertices.push(vec4(x, 0.0, z, 1.0));
-        cylinderBotVertices.push(vec4(x1, 0.0, z1, 1.0));
+        triangle(points, normals,
+                vec4(0.0, 0.0, 0.0, 1.0),
+                vec4(x, 0.0, z, 1.0),
+                vec4(x1, 0.0, z1, 1.0));
 
         //Sidevertices
-        cylinderSideVertices.push(vec4(x1, h, z1));
-        cylinderSideVertices.push(vec4(x1, 0.0, z1, 1.0));
-        cylinderSideVertices.push(vec4(x, 0.0, z, 1.0));
+        triangle(points, normals,
+                vec4(x1, h, z1),
+                vec4(x1, 0.0, z1, 1.0),
+                vec4(x, 0.0, z, 1.0));
 
-        cylinderSideVertices.push(vec4(x, 0.0, z, 1.0));
-        cylinderSideVertices.push(vec4(x, h, z, 1.0));
-        cylinderSideVertices.push(vec4(x1, h, z1));
+        triangle(points, normals,
+                vec4(x, 0.0, z, 1.0),
+                vec4(x, h, z, 1.0),
+                vec4(x1, h, z1));
 
-        //Topvertices
-        cylinderTopVertices.push(vec4(0.0, h, 0.0, 1.0));
-        cylinderTopVertices.push(vec4(x, h, z, 1.0));
-        cylinderTopVertices.push(vec4(x1, h, z1, 1.0));
-    }
+        // //Topvertices
+        triangle(points, normals,
+                vec4(0.0, h, 0.0, 1.0),
+                vec4(x, h, z, 1.0),
+                vec4(x1, h, z1, 1.0));
+        }
 
-    return cylinderBotVertices.concat(cylinderSideVertices, cylinderTopVertices);
+    return { "points" : points, "normals" : normals };
 }
 
 
 function Cylinder(size, segments)
 {
-    this.pointsArray = cylinderPoints(segments);
-    Primitive.call(this, size, this.pointsArray);
+    var data = cylinderPoints(segments);
+    this.pointsArray = data.points;
+    this.normalsArray = data.normals;
+    Primitive.call(this, size, this.pointsArray, this.normalsArray);
 };
