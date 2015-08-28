@@ -41,6 +41,11 @@ const at = vec3(0.0, 0.0, 0.0);
 const up = vec3(0.0, 1.0, 0.0);
 var viewMatrix =  lookAt(eye, at, up);
 
+var lightPosition = vec4(1.0, -1.0, 0.0, 1.0 );
+var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
+var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
+var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+
 var axisPoints = [];
 axisPoints.push(vec4(0.0, 0.0, 0.0));
 axisPoints.push(vec4(1.0, 0.0, 0.0));
@@ -221,13 +226,15 @@ window.onload = function init() {
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.CUL_FACE);
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
 
     //
     //  Load shaders
     //
-    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
-    gl.useProgram( program );
+    var simpleProgram = initShaders( gl, "vertex-shader", "fragment-shader" );
+    var program = initShaders( gl, "vertex-shader-lightning", "fragment-shader-lightning" );
+    gl.useProgram( simpleProgram );
     axisBuffer = gl.createBuffer();
 
     gl.bindBuffer( gl.ARRAY_BUFFER, axisBuffer);
@@ -235,15 +242,16 @@ window.onload = function init() {
 
     function drawAxis()
     {
+        gl.useProgram( simpleProgram );
         gl.bindBuffer( gl.ARRAY_BUFFER, axisBuffer);
 
-        var vPosition = gl.getAttribLocation( program, "vPosition");
+        var vPosition = gl.getAttribLocation( simpleProgram, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vPosition);
 
-        var modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
-        var projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
-        var colorLoc = gl.getUniformLocation( program, "color" );
+        var modelViewMatrixLoc = gl.getUniformLocation( simpleProgram, "modelViewMatrix" );
+        var projectionMatrixLoc = gl.getUniformLocation( simpleProgram, "projectionMatrix" );
+        var colorLoc = gl.getUniformLocation( simpleProgram, "color" );
 
         gl.uniformMatrix4fv( modelViewMatrixLoc, false, flatten( mult(viewMatrix, rotationMatrix)) );
         gl.uniformMatrix4fv( projectionMatrixLoc, false, flatten(projectionMatrix) );

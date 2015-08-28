@@ -18,14 +18,14 @@ function conePoints(segments) {
 
         //Bottomvertices
         triangle(points, normals,
-                vec4(0.0, 0.0, 0.0, 1.0),
                 vec4(x, 0.0, z, 1.0),
+                vec4(0.0, 0.0, 0.0, 1.0),
                 vec4(x1, 0.0, z1, 1.0));
 
         //Sidevertices
         triangle(points, normals,
-                vec4(0.0, h, 0.0),
                 vec4(x1, 0.0, z1, 1.0),
+                vec4(0.0, h, 0.0),
                 vec4(x, 0.0, z, 1.0));
     }
 
