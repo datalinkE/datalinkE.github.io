@@ -64,6 +64,7 @@ var rotationMatrix = mat4(1.0);
 
 var lastMouseDown = Date.now();
 var lastFrameDrawn= Date.now();
+var startedAt = Date.now();
 
 function handleMouseDown(event) {
     mouseDown = true;
@@ -225,7 +226,6 @@ window.onload = function init() {
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
-    gl.clearColor( 0.1, 0.1, 0.1, 1.0 );
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
@@ -270,6 +270,7 @@ window.onload = function init() {
     }
 
     var sphere1 = new Sphere(0.3, 0);
+    sphere1.position = vec4(0, 0, 0, 1.0)
     primitivesToRender.push(sphere1);
 
     var ls = new Sphere(0.01, 3);
@@ -280,6 +281,16 @@ window.onload = function init() {
 
     function render()
     {
+        var now = Date.now();
+        var timeDelta = now - startedAt;
+        lastFrameDrawn = now;
+
+        var angle = timeDelta * 0.001;
+        lightPosition = vec4( Math.sin(angle), 0.0, Math.cos(angle), 1.0);
+        ls.position = lightPosition;
+
+        gl.clearColor( 0.1, 0.1, 0.1, 1.0 );
+        gl.clear(gl.COLOR_BUFER_BIT | gl.DEPTH_BUFER_BIT);
         //console.log("render");
         drawAxis();
 
@@ -295,10 +306,7 @@ window.onload = function init() {
         };
 
         window.requestAnimFrame(render);
-        var now = Date.now();
-        var timeDelta = now - lastFrameDrawn;
-        lastFrameDrawn = now;
-    }
+   }
 
     render();
 };
