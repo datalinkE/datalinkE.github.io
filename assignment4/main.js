@@ -33,7 +33,7 @@ var cursorColor = vec3(0.4, 0.0, 0.4);
 var cursorColorWf = vec3(0.4, 0.4, 0.0);
 var cursorWireframe = true;
 var cursorPolygons = false;
-var cursorSize = 0.5;
+var cursorSize = 0.3;
 
 var eyeOffset = 2.0;
 var eye = vec3(0.0, 0.0, eyeOffset);
@@ -41,7 +41,7 @@ const at = vec3(0.0, 0.0, 0.0);
 const up = vec3(0.0, 1.0, 0.0);
 var viewMatrix =  lookAt(eye, at, up);
 
-var lightPosition = vec4(1.0, -1.0, 0.0, 1.0 );
+var lightPosition = vec4(-1.0, 0.0, 0.0, 1.0 );
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
@@ -63,6 +63,7 @@ var lastMouseY = null;
 var rotationMatrix = mat4(1.0);
 
 var lastMouseDown = Date.now();
+var lastFrameDrawn= Date.now();
 
 function handleMouseDown(event) {
     mouseDown = true;
@@ -224,10 +225,10 @@ window.onload = function init() {
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
+    gl.clearColor( 0.1, 0.1, 0.1, 1.0 );
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.CUL_FACE);
-    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
+    gl.enable(gl.CULL_FACE);
 
     //
     //  Load shaders
@@ -268,10 +269,12 @@ window.onload = function init() {
         gl.disableVertexAttribArray(vPosition);
     }
 
-    var sphere1 = new Sphere(0.3, 5);
-    sphere1.color = vec3(0.4, 0.4, 0.4);
-    sphere1.colorWf = vec3(0.4, 0.0, 0.4);
+    var sphere1 = new Sphere(0.3, 0);
     primitivesToRender.push(sphere1);
+
+    var ls = new Sphere(0.01, 3);
+    ls.position = lightPosition;
+    primitivesToRender.push(ls);
 
     respawnCursor();
 
@@ -292,6 +295,9 @@ window.onload = function init() {
         };
 
         window.requestAnimFrame(render);
+        var now = Date.now();
+        var timeDelta = now - lastFrameDrawn;
+        lastFrameDrawn = now;
     }
 
     render();

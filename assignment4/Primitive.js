@@ -6,7 +6,7 @@ function triangle(pointsRef, normalsRef, a, b, c) {
     pointsRef.push(c);
 
     var t1 = subtract(b, a);
-    var t2 = subtract(c, a);
+    var t2 = subtract(a, c);
     var normal = normalize(cross(t2, t1));
     normal = vec4(normal);
     normal[3]  = 0.0;
