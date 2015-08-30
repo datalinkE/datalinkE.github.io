@@ -75,26 +75,18 @@ function Primitive(size, points, normals)
 
         var modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
         var projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
-        var normalMatrixLoc = gl.getUniformLocation( program, "normalMatrix" );
 
         var modelViewMatrix = mat4(1.0);
         modelViewMatrix = mult(scalem(this.size, this.size, this.size), modelViewMatrix);
         modelViewMatrix = mult(translate(this.position[0], this.position[1], this.position[2]), modelViewMatrix);
         modelViewMatrix = mult(this.orientation, modelViewMatrix);
         //////////// above - model, below - view
+
         modelViewMatrix = mult(rotationMatrix, modelViewMatrix);
         modelViewMatrix = mult(viewMatrix, modelViewMatrix);
 
-        var normalMatrix = [
-            vec3(modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2]),
-            vec3(modelViewMatrix[1][0], modelViewMatrix[1][1], modelViewMatrix[1][2]),
-            vec3(modelViewMatrix[2][0], modelViewMatrix[2][1], modelViewMatrix[2][2])
-        ];
-
-
         gl.uniformMatrix4fv( modelViewMatrixLoc, false, flatten(modelViewMatrix) );
         gl.uniformMatrix4fv( projectionMatrixLoc, false, flatten(projectionMatrix) );
-        gl.uniformMatrix3fv( normalMatrixLoc, false, flatten(normalMatrix) );
 
         var ambientProduct = mult(lightAmbient, this.materialAmbient);
         var diffuseProduct = mult(lightDiffuse, this.materialDiffuse);
