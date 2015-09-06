@@ -29,11 +29,11 @@ projectionMatrix = perspective(fov, aspect, 0.1, far);
 
 var primitivesToRender = [];
 var cursorPrimitive = null;
-var cursorColor = vec3(0.4, 0.0, 0.4);
+var cursorColor = vec3(0.8, 0.2, 0.8);
 var cursorColorWf = vec3(0.4, 0.4, 0.0);
 var cursorWireframe = false;
 var cursorPolygons = true;
-var cursorSize = 0.5;
+var cursorSize = 0.25;
 
 var eyeOffset = 2.0;
 var eye = vec3(0.0, 0.0, eyeOffset);
@@ -72,7 +72,7 @@ function respawnCursor()
     var newCursor = null;
 
 
-    newCursor = new Sphere(cursorSize, 4);
+    newCursor = new Sphere(cursorSize, 4, image1);
 
 
     newCursor.color = cursorColor;
@@ -171,8 +171,33 @@ function setupUI()
     canvas.onwheel = handleMouseWheel;
 }
 
+var image1 = null;
+var image2 = null;
+
+function setupTextures()
+{
+    image1 = new Uint8Array(4*texSize*texSize);
+    for ( var i = 0; i < texSize; i++ ) {
+        for ( var j = 0; j <texSize; j++ ) {
+            var patchx = Math.floor(i/(texSize/numChecks));
+            var patchy = Math.floor(j/(texSize/numChecks));
+            var c;
+            if(patchx%2 ^ patchy%2) { c = 255; }
+            else { c = 0; }
+            //c = 255*(((i & 0x8) == 0) ^ ((j & 0x8)  == 0))
+            image1[4*i*texSize+4*j] = c;
+            image1[4*i*texSize+4*j+1] = c;
+            image1[4*i*texSize+4*j+2] = c;
+            image1[4*i*texSize+4*j+3] = 255;
+        }
+    }
+
+    image2 = document.getElementById("texImage");
+}
+
 window.onload = function init() {
 
+    setupTextures();
     setupUI();
 
     gl = WebGLUtils.setupWebGL( canvas );
@@ -219,9 +244,8 @@ window.onload = function init() {
         gl.disableVertexAttribArray(vPosition);
     }
 
-    var sphere1 = new Sphere(0.3, 5);
-    sphere1.color = vec3(0.4, 0.4, 0.4);
-    sphere1.colorWf = vec3(0.4, 0.0, 0.4);
+    var sphere1 = new Sphere(0.6, 5, image2);
+    sphere1.color = vec3(1.0, 1.0, 1.0);
     primitivesToRender.push(sphere1);
 
     respawnCursor();

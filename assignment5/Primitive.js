@@ -5,22 +5,7 @@ var numChecks = 4;
 
 // Create a checkerboard pattern using floats
 
-var image1 = new Uint8Array(4*texSize*texSize);
-
-for ( var i = 0; i < texSize; i++ ) {
-    for ( var j = 0; j <texSize; j++ ) {
-        var patchx = Math.floor(i/(texSize/numChecks));
-        var patchy = Math.floor(j/(texSize/numChecks));
-        var c;
-        if(patchx%2 ^ patchy%2) { c = 255; }
-        else { c = 0; }
-        //c = 255*(((i & 0x8) == 0) ^ ((j & 0x8)  == 0))
-        image1[4*i*texSize+4*j] = c;
-        image1[4*i*texSize+4*j+1] = c;
-        image1[4*i*texSize+4*j+2] = c;
-        image1[4*i*texSize+4*j+3] = 255;
-    }
-}
+//https://upload.wikimedia.org/wikipedia/commons/7/71/Weaved_truncated_square_tiling.png
 
 function configureTexture(image) {
     var texture1 = gl.createTexture();
@@ -29,14 +14,25 @@ function configureTexture(image) {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, texSize, texSize, 0,
         gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.generateMipmap( gl.TEXTURE_2D );
-    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
-           gl.NEAREST);
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
     return texture1;
 };
 
+function configureTextureWeb(image) {
+    var texture2 = gl.createTexture();
+    gl.bindTexture( gl.TEXTURE_2D, texture2 );
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
-function Primitive(size, points, texCoords)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+
+    //gl.generateMipmap( gl.TEXTURE_2D );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    //gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+    return texture2;
+};
+
+function Primitive(size, points, texCoords, textureSrc)
 {
     // member variables
     this.pointsArray = points;
@@ -55,6 +51,7 @@ function Primitive(size, points, texCoords)
     this.tBuffer = null;
 
     this.texture = 0;
+    this.textureSrc = textureSrc;
 
     this.render = function(gl, program)
     {
@@ -78,7 +75,16 @@ function Primitive(size, points, texCoords)
             this.tBuffer = gl.createBuffer();
             gl.bindBuffer( gl.ARRAY_BUFFER, this.tBuffer);
             gl.bufferData( gl.ARRAY_BUFFER, flatten(this.texCoordsArray), gl.STATIC_DRAW );
-            this.texture = configureTexture(image1);
+            console.log(this.textureSrc.constructor.name);
+
+            if (this.textureSrc && this.textureSrc.constructor.name == "HTMLImageElement")
+            {
+                this.texture = configureTextureWeb(this.textureSrc);
+            }
+            else
+            {
+                this.texture = configureTexture(this.textureSrc);
+            }
         }
         else
         {

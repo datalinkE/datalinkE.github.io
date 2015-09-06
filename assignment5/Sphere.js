@@ -60,9 +60,9 @@ function makeTexCoords(points)
     return coords;
 }
 
-function Sphere(size, numTimesToSubdivide)
+function Sphere(size, numTimesToSubdivide, textureSrc)
 {
     this.pointsArray = spherePoints(numTimesToSubdivide);
     this.texCoordsArray = makeTexCoords(this.pointsArray);
-    Primitive.call(this, size, this.pointsArray, this.texCoordsArray);
+    Primitive.call(this, size, this.pointsArray, this.texCoordsArray, textureSrc);
 };
